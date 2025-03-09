@@ -1,14 +1,17 @@
 import logo from './logo.svg';
 import './App.css';
 import { useEffect, useState } from "react";
-import { ethers, BrowserProvider } from "ethers";
+import { ethers, BrowserProvider , Contract } from "ethers";
+import daobuilderABI from "./build/contracts/Daobuilder.json" 
+import AdminsComponent from './AdminsComponent';
 
 
 
 
 function App() {
-  let signer = null;
-  let provider = null;
+  var signer = null;
+  var provider = null;
+  const [contract , setContract] = useState(null);
   const [walletaddress,setWalletaddress] = useState(null);
   const [etheraccount,setEtheraccount] = useState(null);
   const [weiaccount,setWeiaccount] = useState(null);
@@ -16,6 +19,8 @@ function App() {
   const [blocknumber,setBlocknumber] = useState(null);
   const [balance,setBalance] = useState(null);
   const [tranactioncount,setTranactioncount] = useState(null);
+  const [reciept , setReciept] = useState(null);
+  const [signerGlob , setSignerGlob] = useState(null);
 
   const getConnectedAccount = async ()=>{
     const accounts = await provider.send("eth_requestAccounts", []);
@@ -35,6 +40,22 @@ function App() {
     }
   };
 
+  const sendtransaction = async ()=>{
+    let tx = await signerGlob.sendTransaction({
+      to: "0x06505D3D1760DE7368860380e03edf5a2CA88D69",
+      value: ethers.parseEther("1.0")
+    });
+    
+    // Often you may wish to wait until the transaction is mined
+    let receipttmp = await tx.wait();
+    setReciept(receipttmp);
+  };
+  const initcontract = async ()=>{
+    // console.log("ABI Type:", typeof daobuilderABI);
+    let contracttmp = new Contract("0x99d876895A758AA3f92EcC899490Be888840e7F0",daobuilderABI.abi,provider);
+    setContract(contracttmp);
+  };
+
   useEffect(()=>async function(){
     if(window.ethereum==null){
       provider = new ethers.JsonRpcProvider('http://localhost:7545');
@@ -45,6 +66,8 @@ function App() {
       
     }
     signer = await provider.getSigner();
+    // console.log(signer);
+    setSignerGlob(signer);
     setBlocknumber(await provider.getBlockNumber());
     await getConnectedAccount();
 
@@ -58,6 +81,7 @@ function App() {
     });
     await setEthValues();
     await getBalances();
+    await initcontract();
   },[])
   
   return (
@@ -70,6 +94,13 @@ function App() {
       blocknumber: {blocknumber}<br/>
       balace: {balance}<br/>
       tranactioncount: {tranactioncount}<br/>
+
+
+      <button onClick={async ()=>{await sendtransaction()}}>send the transaction</button>
+      <div>{reciept}</div>
+
+
+      {contract && <AdminsComponent contract={contract}/>}
     </div>
   );
 }
