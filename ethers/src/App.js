@@ -1,7 +1,7 @@
 import logo from './logo.svg';
 import './App.css';
 import { useEffect, useState } from "react";
-import { ethers, BrowserProvider , Contract } from "ethers";
+import { ethers, BrowserProvider , Contract, verifyMessage } from "ethers";
 import daobuilderABI from "./build/contracts/Daobuilder.json" 
 import AdminsComponent from './AdminsComponent';
 
@@ -12,6 +12,7 @@ function App() {
   var signer = null;
   var provider = null;
   const [contract , setContract] = useState(null);
+  const [writerContract , setWriterContract] = useState(null);
   const [walletaddress,setWalletaddress] = useState(null);
   const [etheraccount,setEtheraccount] = useState(null);
   const [weiaccount,setWeiaccount] = useState(null);
@@ -53,7 +54,9 @@ function App() {
   const initcontract = async ()=>{
     // console.log("ABI Type:", typeof daobuilderABI);
     let contracttmp = new Contract("0x99d876895A758AA3f92EcC899490Be888840e7F0",daobuilderABI.abi,provider);
+    let contracttmpsinger = new Contract("0x99d876895A758AA3f92EcC899490Be888840e7F0",daobuilderABI.abi,signer);
     setContract(contracttmp);
+    setWriterContract(contracttmpsinger);
   };
 
   useEffect(()=>async function(){
@@ -82,6 +85,11 @@ function App() {
     await setEthValues();
     await getBalances();
     await initcontract();
+
+    let message = "Hi I'm aref";
+    let sig = await signer.signMessage(message);
+    let res = verifyMessage(sig);
+    console.table(verifyMessage);
   },[])
   
   return (
@@ -100,7 +108,7 @@ function App() {
       <div>{reciept}</div>
 
 
-      {contract && <AdminsComponent contract={contract}/>}
+      {contract && <AdminsComponent contract={contract} singercontract={writerContract}/>}
     </div>
   );
 }
