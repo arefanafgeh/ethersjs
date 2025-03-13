@@ -35,9 +35,9 @@ function AdminsComponent({contract,singercontract}){
               adminsArr[i] = parsedAdmin;
         }
         setAdmins(adminsArr);
-        let historicevents = contract.filters.NewAdminAdded;
-        let events = await singercontract.queryFilter(historicevents, -100)
-        console.log(events);
+        // let historicevents = contract.filters.NewAdminAdded;
+        // let events = await singercontract.queryFilter(historicevents, -100)
+        // console.log(events);
     }
     useEffect(()=>{
         if(adminCount==null)

@@ -60,6 +60,7 @@ function App() {
   };
 
   useEffect(()=>async function(){
+    // alert(ethers.version);
     if(window.ethereum==null){
       provider = new ethers.JsonRpcProvider('http://localhost:7545');
     
@@ -69,7 +70,6 @@ function App() {
       
     }
     signer = await provider.getSigner();
-    // console.log(signer);
     setSignerGlob(signer);
     setBlocknumber(await provider.getBlockNumber());
     await getConnectedAccount();
@@ -86,12 +86,16 @@ function App() {
     await getBalances();
     await initcontract();
 
-    let message = "Hi I'm aref";
-    let sig = await signer.signMessage(message);
-    let res = verifyMessage(sig);
-    console.table(verifyMessage);
+    
   },[])
   
+  const signMessage = async()=>{
+    let message = "Hi I'm aref";
+    alert(message);
+    let sig = await walletaddress.signMessage(message);
+    let res = verifyMessage(sig);
+    console.log(res);
+  };
   return (
     <div className="App">
       Your Wallet Address: {walletaddress}
@@ -109,6 +113,9 @@ function App() {
 
 
       {contract && <AdminsComponent contract={contract} singercontract={writerContract}/>}
+
+      <br/>
+      <button onClick={async()=>{await signMessage()}}>Sign the message</button>
     </div>
   );
 }
