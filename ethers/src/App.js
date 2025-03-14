@@ -12,6 +12,7 @@ function App() {
   var signer = null;
   var provider = null;
   const [contract , setContract] = useState(null);
+  const [contractCode , setContractCode] = useState(null);
   const [writerContract , setWriterContract] = useState(null);
   const [walletaddress,setWalletaddress] = useState(null);
   const [etheraccount,setEtheraccount] = useState(null);
@@ -57,10 +58,18 @@ function App() {
     let contracttmpsinger = new Contract("0x99d876895A758AA3f92EcC899490Be888840e7F0",daobuilderABI.abi,signer);
     setContract(contracttmp);
     setWriterContract(contracttmpsinger);
+    
   };
 
+  const getOptCodeOfSM = async ()=>{
+    let smcode = provider.getCode("0x99d876895A758AA3f92EcC899490Be888840e7F0");
+    setContractCode(smcode);
+  }
   useEffect(()=>async function(){
     // alert(ethers.version);
+    // var mamadencoded = ethers.encodeBytes32String('mamad');
+    // console.log(mamadencoded);
+    // console.log(ethers.decodeBytes32String(mamadencoded));
     if(window.ethereum==null){
       provider = new ethers.JsonRpcProvider('http://localhost:7545');
     
@@ -85,7 +94,7 @@ function App() {
     await setEthValues();
     await getBalances();
     await initcontract();
-
+    await getOptCodeOfSM();
     
   },[])
   
@@ -116,6 +125,9 @@ function App() {
 
       <br/>
       <button onClick={async()=>{await signMessage()}}>Sign the message</button>
+      <br/>
+      <h3>smart contract Optcode</h3>
+      {contractCode}
     </div>
   );
 }
